@@ -1,4 +1,4 @@
-import DummyClass from "../src/chimney-ts"
+import DummyClass from "./chimney-ts"
 
 /**
  * Dummy test
