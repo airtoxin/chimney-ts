@@ -1,14 +1,70 @@
-import DummyClass from "./chimney-ts";
+import { Chimney } from "./chimney-ts";
 
-/**
- * Dummy test
- */
-describe("Dummy test", () => {
-  it("works if true is truthy", () => {
-    expect(true).toBeTruthy();
+type Not<A> = A extends true ? false : true;
+
+export type TypeEq<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2)
+  ? true
+  : false;
+
+export type TypeHas<A, B> = B extends keyof A ? true : false;
+
+export function assertType<T extends true>() {
+  // empty
+}
+
+type Transformable<A> = TypeHas<A, "transform">;
+
+describe("Chimney", () => {
+  const square = { size: 10 };
+  const rect = { width: 10, height: 10 };
+  const coloredRect = { width: 10, height: 10, color: "red" };
+
+  type Square = typeof square;
+  type Rect = typeof rect;
+  type ColoredRect = typeof coloredRect;
+
+  it("From/Into types are exactly equal type", () => {
+    const result = new Chimney(rect).into<Rect>().transform();
+    type Result = typeof result;
+    assertType<TypeEq<Result, Rect>>();
   });
 
-  it("DummyClass is instantiable", () => {
-    expect(new DummyClass()).toBeInstanceOf(DummyClass);
+  it("From type compatible to Into type", () => {
+    const coloredRect = { ...rect, color: "red" };
+    const result = new Chimney(coloredRect).into<Rect>().transform();
+    type Result = typeof result;
+    assertType<TypeEq<Result, Rect>>();
+  });
+
+  it("Can't call transform method if From type not compatible to Into type", () => {
+    const transformer = new Chimney(square).into<Rect>();
+    type Transformer = typeof transformer;
+    assertType<Not<Transformable<Transformer>>>();
+  });
+
+  it("From type transform with withFieldConst to Into type", () => {
+    const result = new Chimney(square)
+      .into<Rect>()
+      .withFieldConst("width", 10)
+      .withFieldConst("height", 10)
+      .transform();
+    type Result = typeof result;
+    assertType<TypeEq<Result, Rect>>();
+  });
+
+  it("Can't call transform method if required fields are not exists at Transformer type", () => {
+    const transformer = new Chimney(square).into<Rect>().withFieldConst("width", 10);
+    type Transformer = typeof transformer;
+    assertType<Not<Transformable<Transformer>>>();
+  });
+
+  it("withFieldRenamed", () => {
+    const result = new Chimney(square)
+      .into<ColoredRect>()
+      .withFieldRenamed("size", "width")
+      .withFieldComputed("height", f => f.size)
+      .withFieldConst("color", "blue")
+      .omitExtraFields()
+      .transform();
   });
 });
