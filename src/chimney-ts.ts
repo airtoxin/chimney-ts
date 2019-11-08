@@ -1,8 +1,15 @@
-import { Assign, Intersection } from "utility-types";
+import { Assign, Intersection, PickByValue } from "utility-types";
 
 type TransType<Into extends {}, From extends {}> = From extends Into
   ? TransformableTransformer<Into, From>
   : Transformer<Into, From>;
+
+type KeyByValueType<Obj extends {}, ValueType> = keyof PickByValue<Obj, ValueType>;
+
+type SameFieldValueKeyInB<A extends {}, B extends {}, AFieldName extends keyof A> = KeyByValueType<
+  B,
+  A[AFieldName]
+>;
 
 class Transformer<Into extends {}, From extends {}> {
   withFieldConst<
@@ -14,7 +21,7 @@ class Transformer<Into extends {}, From extends {}> {
 
   withFieldRenamed<
     FromFieldName extends keyof From,
-    IntoFieldName extends From[FromFieldName] extends Into[IntoFieldName] ? keyof Into : never,
+    IntoFieldName extends SameFieldValueKeyInB<From, Into, FromFieldName>,
     NextFrom extends Assign<From, Record<IntoFieldName, Into[IntoFieldName]>>
   >(fromFieldName: FromFieldName, intoFieldName: IntoFieldName): TransType<Into, NextFrom> {
     return null as any;
