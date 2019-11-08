@@ -36,10 +36,10 @@ class Transformer<Into extends {}, From extends {}> {
     IntoFieldName extends keyof Into,
     Computer extends (v: From) => Into[IntoFieldName],
     NextFrom extends Assign<From, Record<IntoFieldName, Into[IntoFieldName]>>
-  >(intoFieldName: IntoFieldName, computer: Computer): TransType<Into, NextFrom> {
+  >(intoFieldName: IntoFieldName, computeFn: Computer): TransType<Into, NextFrom> {
     return new TransformableTransformer({
       ...this.fromObj,
-      [intoFieldName]: computer(this.fromObj)
+      [intoFieldName]: computeFn(this.fromObj)
     }) as any;
   }
 }
