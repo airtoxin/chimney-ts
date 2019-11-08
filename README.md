@@ -3,7 +3,7 @@
 [![Travis](https://img.shields.io/travis/airtoxin/chimney-ts.svg)](https://travis-ci.org/airtoxin/chimney-ts)
 [![Donate](https://img.shields.io/badge/donate-paypal-blue.svg)](https://paypal.me/airtoxin)
 
-Type safe transformation in TypeScript.
+Type safe object transformation in TypeScript
 
 ## Usage
 
