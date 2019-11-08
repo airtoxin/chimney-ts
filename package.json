@@ -1,6 +1,6 @@
 {
   "name": "chimney-ts",
-  "version": "0.0.0-development",
+  "version": "0.0.1-development",
   "description": "",
   "keywords": [],
   "main": "dist/chimney-ts.umd.js",
