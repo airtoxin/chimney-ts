@@ -91,21 +91,4 @@ describe("Chimney", () => {
     type Transformer = typeof transformer;
     assertType<Not<Transformable<Transformer>>>();
   });
-
-  it("omit extra fields in result object if omitExtraFields called", () => {
-    const resultNotOmitted = new Chimney(square)
-      .into<Rect>()
-      .withFieldRenamed("size", "width")
-      .withFieldRenamed("size", "height")
-      .transform();
-    const resultOmitted = new Chimney(square)
-      .into<Rect>()
-      .withFieldRenamed("size", "width")
-      .withFieldRenamed("size", "height")
-      .omitExtraFields()
-      .transform();
-
-    expect(resultNotOmitted).toEqual({ ...square, ...rect });
-    expect(resultOmitted).toEqual(rect);
-  });
 });

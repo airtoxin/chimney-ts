@@ -1,4 +1,4 @@
-import { Assign, Intersection, PickByValue } from "utility-types";
+import { Assign, PickByValue } from "utility-types";
 
 type TransType<Into extends {}, From extends {}> = From extends Into
   ? TransformableTransformer<Into, From>
@@ -12,11 +12,13 @@ type SameFieldValueKeyInB<A extends {}, B extends {}, AFieldName extends keyof A
 >;
 
 class Transformer<Into extends {}, From extends {}> {
+  constructor(protected fromObj: From) {}
+
   withFieldConst<
     IntoFieldName extends keyof Into,
     NextFrom extends Assign<From, Record<IntoFieldName, Into[IntoFieldName]>>
   >(intoFieldName: IntoFieldName, constValue: Into[IntoFieldName]): TransType<Into, NextFrom> {
-    return null as any;
+    return new TransformableTransformer({ ...this.fromObj, [intoFieldName]: constValue }) as any;
   }
 
   withFieldRenamed<
@@ -24,7 +26,10 @@ class Transformer<Into extends {}, From extends {}> {
     IntoFieldName extends SameFieldValueKeyInB<From, Into, FromFieldName>,
     NextFrom extends Assign<From, Record<IntoFieldName, Into[IntoFieldName]>>
   >(fromFieldName: FromFieldName, intoFieldName: IntoFieldName): TransType<Into, NextFrom> {
-    return null as any;
+    return new TransformableTransformer({
+      ...this.fromObj,
+      [intoFieldName]: this.fromObj[fromFieldName]
+    }) as any;
   }
 
   withFieldComputed<
@@ -32,17 +37,20 @@ class Transformer<Into extends {}, From extends {}> {
     Computer extends (v: From) => Into[IntoFieldName],
     NextFrom extends Assign<From, Record<IntoFieldName, Into[IntoFieldName]>>
   >(intoFieldName: IntoFieldName, computer: Computer): TransType<Into, NextFrom> {
-    return null as any;
-  }
-
-  omitExtraFields<NextFrom extends Intersection<Into, From>>(): TransType<Into, NextFrom> {
-    return null as any;
+    return new TransformableTransformer({
+      ...this.fromObj,
+      [intoFieldName]: computer(this.fromObj)
+    }) as any;
   }
 }
 
 class TransformableTransformer<Into extends {}, From extends Into> extends Transformer<Into, From> {
+  constructor(protected fromObj: From) {
+    super(fromObj);
+  }
+
   transform(): Into {
-    return null as any;
+    return this.fromObj;
   }
 }
 
@@ -50,6 +58,6 @@ export class Chimney<From extends {}> {
   constructor(private fromObj: From) {}
 
   into<Into extends {}>(): TransType<Into, From> {
-    return null as any;
+    return new TransformableTransformer(this.fromObj) as any;
   }
 }
