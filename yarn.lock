@@ -7663,7 +7663,7 @@ sax@^1.2.4:
   resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
   integrity sha512-NqVDv9TpANUjFm0N8uM5GxL36UgKi9/atZw+x7YFnQ8ckwFGKrl4xX4yWtrey3UJm5nP1kUbnYgLopqWNSRhWw==
 
-semantic-release@^15.9.16:
+semantic-release@^15.13.30:
   version "15.13.30"
   resolved "https://registry.yarnpkg.com/semantic-release/-/semantic-release-15.13.30.tgz#89a67d1c53fb1f3caee3ce9958a9017333747119"
   integrity sha512-QetSFNr2hO6dZ/NDBh49neESF6OGinJfh4NcVhzMRg+rZpeqXq9sCbpZr0uDu+5HSkJYnX25MpMTF0QyyFhpxg==
@@ -8887,11 +8887,6 @@ utile@0.3.x:
     mkdirp "0.x.x"
     ncp "1.0.x"
     rimraf "2.x.x"
-
-utility-types@^3.9.0:
-  version "3.9.0"
-  resolved "https://registry.yarnpkg.com/utility-types/-/utility-types-3.9.0.tgz#c322d974e7062ec967077384c3b75077a955d83b"
-  integrity sha512-bUUsGr7NuI1p/6GpDCI/PUCJ1y5KWO4xul8RWOcmUwXSjLoi6WoV9YLNqBF7lH4RRy/jgmhYCE49eM0bnaijMQ==
 
 uuid@^3.3.2, uuid@^3.3.3:
   version "3.3.3"
