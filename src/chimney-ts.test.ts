@@ -22,6 +22,13 @@ type Square = typeof square;
 type Rect = typeof rect;
 type ColoredRect = typeof coloredRect;
 
+const promiseLike = <T>(v: T) =>
+  (({
+    then() {
+      return promiseLike(v);
+    }
+  } as any) as Promise<T>);
+
 describe("Chimney", () => {
   it("From/Into types are exactly equal type", () => {
     const result = new Chimney(rect).into<Rect>().transform();
@@ -165,6 +172,170 @@ describe("Chimney Array", () => {
 
   it("can't call transform method if required fields are not exists at Transformer type in withFieldComputed", () => {
     const transformer = new Chimney([square])
+      .into<Rect>()
+      .withFieldComputed("width", square => square.size * 10);
+    type Transformer = typeof transformer;
+    assertType<Not<Transformable<Transformer>>>();
+  });
+});
+
+describe("Chimney Promise", () => {
+  it("From/Into types are exactly equal type", async () => {
+    const result = new Chimney(Promise.resolve(rect)).into<Rect>().transform();
+    type Result = typeof result;
+    assertType<TypeEq<Result, Promise<Rect>>>();
+    await expect(result).resolves.toEqual(rect);
+  });
+
+  it("From type compatible to Into type", async () => {
+    const result = new Chimney(Promise.resolve(coloredRect)).into<Rect>().transform();
+    type Result = typeof result;
+    assertType<TypeEq<Result, Promise<Rect>>>();
+    await expect(result).resolves.toEqual(coloredRect);
+  });
+
+  it("can't call transform method if From type not compatible to Into type", () => {
+    const transformer = new Chimney(Promise.resolve(square)).into<Rect>();
+    type Transformer = typeof transformer;
+    assertType<Not<Transformable<Transformer>>>();
+  });
+
+  it("From type transform with withFieldConst to Into type", async () => {
+    const result = new Chimney(Promise.resolve(square))
+      .into<Rect>()
+      .withFieldConst("width", 10)
+      .withFieldConst("height", 10)
+      .transform();
+    type Result = typeof result;
+    assertType<TypeEq<Result, Promise<Rect>>>();
+    await expect(result).resolves.toEqual({ ...square, width: 10, height: 10 });
+  });
+
+  it("can't call transform method if required fields are not exists at Transformer type in withFieldConst", () => {
+    const transformer = new Chimney(Promise.resolve(square))
+      .into<Rect>()
+      .withFieldConst("width", 10);
+    type Transformer = typeof transformer;
+    assertType<Not<Transformable<Transformer>>>();
+  });
+
+  it("From type transform with withFieldRenamed to Into type", async () => {
+    const result = new Chimney(Promise.resolve(square))
+      .into<Rect>()
+      .withFieldRenamed("size", "width")
+      .withFieldRenamed("size", "height")
+      .transform();
+    type Result = typeof result;
+    assertType<TypeEq<Result, Promise<Rect>>>();
+    await expect(result).resolves.toEqual({ ...square, width: square.size, height: square.size });
+  });
+
+  it("can't call transform method if required fields are not exists at Transformer type in withFieldConst", () => {
+    const transformer = new Chimney(Promise.resolve(square))
+      .into<Rect>()
+      .withFieldRenamed("size", "width");
+    type Transformer = typeof transformer;
+    assertType<Not<Transformable<Transformer>>>();
+  });
+
+  it("From type transform with withFieldComputed to Into type", async () => {
+    const result = new Chimney(Promise.resolve(square))
+      .into<Rect>()
+      .withFieldComputed("width", square => square.size * 10)
+      .withFieldComputed("height", square => square.size * 10)
+      .transform();
+    type Result = typeof result;
+    assertType<TypeEq<Result, Promise<Rect>>>();
+    await expect(result).resolves.toEqual({
+      ...square,
+      width: square.size * 10,
+      height: square.size * 10
+    });
+  });
+
+  it("can't call transform method if required fields are not exists at Transformer type in withFieldComputed", () => {
+    const transformer = new Chimney(Promise.resolve(square))
+      .into<Rect>()
+      .withFieldComputed("width", square => square.size * 10);
+    type Transformer = typeof transformer;
+    assertType<Not<Transformable<Transformer>>>();
+  });
+});
+
+describe("Chimney Promise relaxed", () => {
+  it("From/Into types are exactly equal type", () => {
+    const result = new Chimney(promiseLike(rect), { relaxPromise: true }).into<Rect>().transform();
+    type Result = typeof result;
+    assertType<TypeEq<Result, Promise<Rect>>>();
+    expect(result).resolves.toEqual(rect);
+  });
+
+  it("From type compatible to Into type", () => {
+    const result = new Chimney(promiseLike(coloredRect)).into<Rect>().transform();
+    type Result = typeof result;
+    assertType<TypeEq<Result, Promise<Rect>>>();
+    expect(result).resolves.toEqual(coloredRect);
+  });
+
+  it("can't call transform method if From type not compatible to Into type", () => {
+    const transformer = new Chimney(promiseLike(square)).into<Rect>();
+    type Transformer = typeof transformer;
+    assertType<Not<Transformable<Transformer>>>();
+  });
+
+  it("From type transform with withFieldConst to Into type", () => {
+    const result = new Chimney(promiseLike(square))
+      .into<Rect>()
+      .withFieldConst("width", 10)
+      .withFieldConst("height", 10)
+      .transform();
+    type Result = typeof result;
+    assertType<TypeEq<Result, Promise<Rect>>>();
+    expect(result).resolves.toEqual({ ...square, width: 10, height: 10 });
+  });
+
+  it("can't call transform method if required fields are not exists at Transformer type in withFieldConst", () => {
+    const transformer = new Chimney(promiseLike(square)).into<Rect>().withFieldConst("width", 10);
+    type Transformer = typeof transformer;
+    assertType<Not<Transformable<Transformer>>>();
+  });
+
+  it("From type transform with withFieldRenamed to Into type", () => {
+    const result = new Chimney(promiseLike(square))
+      .into<Rect>()
+      .withFieldRenamed("size", "width")
+      .withFieldRenamed("size", "height")
+      .transform();
+    type Result = typeof result;
+    assertType<TypeEq<Result, Promise<Rect>>>();
+    expect(result).resolves.toEqual({ ...square, width: square.size, height: square.size });
+  });
+
+  it("can't call transform method if required fields are not exists at Transformer type in withFieldConst", () => {
+    const transformer = new Chimney(promiseLike(square))
+      .into<Rect>()
+      .withFieldRenamed("size", "width");
+    type Transformer = typeof transformer;
+    assertType<Not<Transformable<Transformer>>>();
+  });
+
+  it("From type transform with withFieldComputed to Into type", () => {
+    const result = new Chimney(promiseLike(square))
+      .into<Rect>()
+      .withFieldComputed("width", square => square.size * 10)
+      .withFieldComputed("height", square => square.size * 10)
+      .transform();
+    type Result = typeof result;
+    assertType<TypeEq<Result, Promise<Rect>>>();
+    expect(result).resolves.toEqual({
+      ...square,
+      width: square.size * 10,
+      height: square.size * 10
+    });
+  });
+
+  it("can't call transform method if required fields are not exists at Transformer type in withFieldComputed", () => {
+    const transformer = new Chimney(promiseLike(square))
       .into<Rect>()
       .withFieldComputed("width", square => square.size * 10);
     type Transformer = typeof transformer;
