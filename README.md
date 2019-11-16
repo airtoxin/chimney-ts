@@ -126,3 +126,17 @@ If transformer is not compatible with Into type, method can't call!
 ```typescript
 transformer.transform()
 ```
+
+## Changelog
+
+### v1.2.0
+
++ Support Array<T> and Promise<T> transformation
+
+### v1.0.2
+
++ Fix bug of type definitions
+
+### v1.0.0
+
++ Initial release
