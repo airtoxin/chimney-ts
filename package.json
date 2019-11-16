@@ -1,6 +1,6 @@
 {
   "name": "chimney-ts",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Type safe object transformation in TypeScript",
   "keywords": [],
   "main": "dist/chimney-ts.umd.js",
