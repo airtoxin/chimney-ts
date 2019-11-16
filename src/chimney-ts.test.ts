@@ -2,7 +2,7 @@ import { Chimney } from "./chimney-ts";
 
 type Not<A> = A extends true ? false : true;
 
-export type TypeEq<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2)
+export type TypeEq<A, B> = (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B ? 1 : 2
   ? true
   : false;
 
@@ -13,7 +13,6 @@ export function assertType<T extends true>() {
 }
 
 type Transformable<A> = TypeHas<A, "transform">;
-
 
 const square = { size: 10 };
 const rect = { width: 10, height: 10 };
@@ -52,7 +51,7 @@ describe("Chimney", () => {
       .transform();
     type Result = typeof result;
     assertType<TypeEq<Result, Rect>>();
-    expect(result).toEqual({ ...square, width: 10, height: 10 })
+    expect(result).toEqual({ ...square, width: 10, height: 10 });
   });
 
   it("can't call transform method if required fields are not exists at Transformer type in withFieldConst", () => {
