@@ -3,7 +3,8 @@
 [![Travis](https://img.shields.io/travis/airtoxin/chimney-ts.svg)](https://travis-ci.org/airtoxin/chimney-ts)
 [![Donate](https://img.shields.io/badge/donate-paypal-blue.svg)](https://paypal.me/airtoxin)
 
-Type safe object transformation in TypeScript
+Type safe object transformation in TypeScript.  
+This project was heavily inspired from https://github.com/scalalandio/chimney
 
 ## Usage
 
@@ -25,6 +26,22 @@ const completeRect = incompleteRect
 // Square transforms into Rect
 ```
 
+Also transforms from Array or Promise
+
+```typescript
+new Chimney([square])
+  .into<Rect>()
+  .withFieldRenamed("size", "width")
+  .withFieldRenamed("size", "height")
+  .transform(); // -> Rect[]
+
+new Chimney(Promise.resolve(square))
+  .into<Rect>()
+  .withFieldRenamed("size", "width")
+  .withFieldRenamed("size", "height")
+  .transform(); // -> Promise<Rect>
+```
+
 ## API
 
 ### Chimney
@@ -38,7 +55,7 @@ const transformer = new Chimney(fromObj).into<Into>();
 
 __type constraints__
 
-+ `fromObj` value must extends `{}` type.
++ `fromObj` value must extends `{} | {}[] | Promise<{}>` type.
 + `Into` type must extends `{}` type.
 
 ### Transformer#withFieldConst
@@ -51,7 +68,10 @@ transformer
   .withFieldConst("height", 10)
 ```
 
-Compatible code: `{ ...fromObj, [intoFieldName]: constValue }`
+Compatible code: 
++ Non-monadic: `{ ...fromObj, [intoFieldName]: constValue }`
++ Array: `fromObj.map(el => ({ ...el, [intoFieldName]: constValue }))`
++ Promise: `fromObj.then(el => ({ ...el, [intoFieldName]: constValue }))`
 
 __arguments & type constraints__
 
@@ -68,7 +88,10 @@ transformer
   .withFieldRenamed("size", "height")
 ```
 
-Compatible code: `{ ...fromObj, [intoFieldName]: fromObj[fromFieldName] }`
+Compatible code: 
++ Non-monadic: `{ ...fromObj, [intoFieldName]: fromObj[fromFieldName] }`
++ Array: `fromObj.map(el => ({ ...el, [intoFieldName]: fromObj[fromFieldName] }))`
++ Promise: `fromObj.then(el => ({ ...el, [intoFieldName]: fromObj[fromFieldName] }))`
 
 __arguments & type constraints__
 
@@ -85,7 +108,10 @@ transformer
   .withFieldComputed("height", fromObj => fromObj.size * 10)
 ```
 
-Compatible code: `{ ...fromObj, [intoFieldName]: computeFn(fromObj) }`
+Compatible code: 
++ Non-monadic: `{ ...fromObj, [intoFieldName]: computeFn(fromObj) }`
++ Array: `fromObj.map(el => ({ ...fromObj, [intoFieldName]: computeFn(fromObj) }))`
++ Promise: `fromObj.then(el => ({ ...fromObj, [intoFieldName]: computeFn(fromObj) }))`
 
 __arguments & type constraints__
 
@@ -94,7 +120,7 @@ __arguments & type constraints__
 
 ### Transformer#transform
 
-Returns transformed value that has `Into` type.  
+Returns transformed value that has `Into` type (or `Into[] | Promise<Into>`).  
 If transformer is not compatible with Into type, method can't call!
 
 ```typescript
